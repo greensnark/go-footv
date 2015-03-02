@@ -54,15 +54,19 @@ type Tty struct {
 
 func defaultTtySize() Pt { return Pt{X: 80, Y: 24} }
 
-func New() *Tty {
+func NewSz(size Pt) *Tty {
 	tty := &Tty{
-		Size:       defaultTtySize(),
+		Size:       size,
 		UTF8:       true,
 		csetSelect: 1 << 1,
 		stateTok:   make([]byte, 1, 10),
 	}
 	tty.init()
 	return tty
+}
+
+func New() *Tty {
+	return NewSz(defaultTtySize())
 }
 
 func (t *Tty) InDECCset() bool {
@@ -79,58 +83,6 @@ func (t *Tty) init() {
 
 func (t *Tty) DefaultAttrChar() AttrChar {
 	return AttrChar{Attr: t.Attr, Ch: ' '}
-}
-
-func (t *Tty) ClearRegion(start, length int) {
-	zero := t.DefaultAttrChar()
-	region := t.Buf[start : length+start]
-	for i := range region {
-		region[i] = zero
-	}
-}
-
-func (t *Tty) Resize(newsize Pt) {
-	if newsize == t.Size {
-		return
-	}
-	oldsize := t.Size
-	t.debug(fmt.Sprintf("Resize from %s -> %s",
-		oldsize.String(), newsize.String()))
-
-	oldbuf := t.Buf
-
-	t.Size = newsize
-	t.Buf = t.allocBuf(t.Size)
-	t.ClearRegion(0, newsize.Area())
-
-	var oldOffset, newOffset int
-	copysize := PointMin(oldsize, newsize)
-	for y := 0; y < copysize.Y; y++ {
-		copy(t.Buf[newOffset:newOffset+copysize.X],
-			oldbuf[oldOffset:oldOffset+copysize.X])
-		oldOffset += oldsize.X
-		newOffset += newsize.X
-	}
-	t.ScrollRange = Range{Low: 0, High: newsize.Y}
-	t.Cursor.X = clamp(t.Cursor.X, 0, newsize.X)
-	t.Cursor.Y = clamp(t.Cursor.Y, 0, newsize.Y-1)
-}
-
-func (t *Tty) ClearScreen() {
-	t.Cursor = Pt{}
-	t.ClearRegion(0, t.Size.Area())
-}
-
-func (t *Tty) Reset() {
-	t.Cursor = Pt{}
-	t.CursorVisible = true
-	t.ScrollRange = Range{0, t.Size.Y}
-	t.savedCursor = Pt{}
-	t.csetShift = 0
-	t.csetSelect = 1 << 1
-	t.ClearRegion(0, t.bufSize())
-	t.changeState(VTNorm)
-	t.clearParState()
 }
 
 func abs(n int) int {
@@ -165,12 +117,6 @@ func (t *Tty) Scroll(scrolledLines int) {
 			t.Buf[sourceOffset:sourceOffset+preservedCharacters])
 		t.ClearRegion(t.posOffset(Pt{0, t.ScrollRange.High - scrolledLines}),
 			scrolledLines*t.Size.X)
-	}
-}
-
-func (t *Tty) Write(content []byte) {
-	for _, b := range content {
-		t.consumeByte(b)
 	}
 }
 
