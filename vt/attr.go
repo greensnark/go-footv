@@ -1,4 +1,4 @@
-package tty
+package vt
 
 const (
 	VT100AttrBold Attribute = iota << 16

@@ -1,4 +1,4 @@
-package tty
+package vt
 
 func clamp(x, min, max int) int {
 	if x < min {

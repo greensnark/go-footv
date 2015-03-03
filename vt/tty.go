@@ -1,6 +1,6 @@
 // Package tty provides a virtual terminal. Based on
 // https://github.com/kilobyte/termrec
-package tty
+package vt
 
 import (
 	"bytes"

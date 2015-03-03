@@ -1,4 +1,4 @@
-package tty
+package vt
 
 import "fmt"
 

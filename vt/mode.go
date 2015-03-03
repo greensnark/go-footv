@@ -1,4 +1,4 @@
-package tty
+package vt
 
 type VTMode int
 
