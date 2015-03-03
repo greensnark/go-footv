@@ -189,6 +189,8 @@ func (t *Tty) currentStateProc(state VTMode) func(byte) {
 		return t.consumeSetG0
 	case VTSetG1:
 		return t.consumeSetG1
+	case VTOsc:
+		return t.consumeOsc
 	}
 	return t.consumeNorm
 }
@@ -311,6 +313,10 @@ func (t *Tty) consumeEsc(b byte) {
 	default:
 		t.err(b)
 	}
+}
+
+// Just wait for OSC clear
+func (t *Tty) consumeOsc(b byte) {
 }
 
 func (t *Tty) consumeEscPercent(b byte) {

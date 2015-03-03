@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 )
@@ -83,6 +84,10 @@ func unescape(in []byte) string {
 	res := &bytes.Buffer{}
 	escaped := false
 	for _, b := range in {
+		// Skip unprintable characters.
+		if b < 32 {
+			continue
+		}
 		if escaped {
 			switch b {
 			case 'a':
@@ -153,7 +158,9 @@ func getTestBlobs() []*testFile {
 
 func TestBlobs(t *testing.T) {
 	term := NewSz(Pt{20, 5})
+	term.Debug = true
 	for _, file := range getTestBlobs() {
+		fmt.Fprintln(os.Stderr, "Testing ", file.String())
 		term.Reset()
 		term.WriteString(file.UnescapedInput())
 		if out := term.DebugDump(); out != file.ExpectedOutput() {

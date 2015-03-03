@@ -87,10 +87,13 @@ func (t *Tty) Reset() {
 	t.Cursor = Pt{}
 	t.Attr = 0x1010
 	t.CursorVisible = true
+	t.AutoWrap = true
+	t.Kpad = false
 	t.ScrollRange = Range{0, t.Size.Y}
 	t.savedCursor = Pt{}
 	t.csetShift = 0
 	t.csetSelect = 1 << 1
+	t.utfCount = 0
 	t.ClearRegion(0, t.bufSize())
 	t.changeState(VTNorm)
 	t.clearParState()
