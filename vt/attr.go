@@ -1,7 +1,7 @@
 package vt
 
 const (
-	VT100AttrBold Attribute = iota << 16
+	VT100AttrBold Attribute = 1 << (16 + iota)
 	VT100AttrDim
 	VT100AttrItalic
 	VT100AttrUnderline
