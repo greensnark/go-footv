@@ -1,4 +1,4 @@
-// Package compfile returns ReadClosers for files that are possible
+// Package compfile returns ReadClosers for files that are possibly
 // compressed, guessing the compression type based on the file
 // extension.
 package compfile
@@ -62,8 +62,8 @@ func Open(file string) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	if compressor, ok := CompressionType[filepath.Ext(file)]; ok {
-		return compressor(br)
+	if decompressor, ok := CompressionType[filepath.Ext(file)]; ok {
+		return decompressor(br)
 	}
 	return br, nil
 }
