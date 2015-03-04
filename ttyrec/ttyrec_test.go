@@ -24,6 +24,7 @@ func TestReadTtyrec(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	defer file.Close()
 	ttr := Reader(file)
 
 	frames := []wantFrame{
